@@ -17,10 +17,11 @@ time.sleep(2)
 def new_client(client, server):
 	server.send_message_to_all("Hey all, a new client has joined us")
 def new_msg(client, server, message):
-    #messageObj = json.loads("\'" + message[0] + "\'")
-    #print(type(messageObj))
-    print(bytes(str(int(float(message)*180)) + "\r\n", 'utf-8'))
-    ser.write(bytes(str(int(float(message)*180)), 'utf-8'))
+    print(message)
+    messageObj = json.loads(message)
+    print(messageObj)
+   # print(bytes(str(int(float(message)*180)) + "\r\n", 'utf-8'))
+    ser.write(bytes(str(int(messageObj['throttle']*180)), 'utf-8'))
 
 
 server = WebsocketServer(13254, host='127.0.0.1')

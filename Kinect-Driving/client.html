@@ -19,10 +19,10 @@
         if (ws) {
           gamepad = navigator.getGamepads();
           gameValues = {
-            "throttle": gamepad[0].buttons[7].value
+            'throttle': gamepad[0].buttons[7].value
           }
-           
-          ws.send(JSON.stringify(gameValues.throttle));
+          console.log(gameValues);
+          ws.send(JSON.stringify(gameValues));
         
         
       }
