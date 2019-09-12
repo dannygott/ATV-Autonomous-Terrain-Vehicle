@@ -1,6 +1,16 @@
 #include <Servo.h>
 Servo myservo;  // create servo object to control a servo
+int val;
+int encoder0PinA = 32;
+int encoder0PinB = 33; 
+int encoder0Pos = 1;
+int encoder0PinALast = LOW;
+int n = LOW;
+int servoPoz = 0;
+
 void setup() {
+  pinMode (encoder0PinA, INPUT);
+  pinMode (encoder0PinB, INPUT);
   Serial.begin(2000000);
   myservo.attach(40);
   Serial.setTimeout(10);
@@ -8,14 +18,26 @@ void setup() {
 }
 
 void loop() {
-
+    
     if (Serial.available()){
      // If anything comes in Serial (USB),
-     int servoPoz = Serial.readStringUntil('!').toInt();
-     myservo.write(servoPoz); 
+     servoPoz = Serial.readStringUntil('!').toInt();
+     //bugged, returns to 90, we want it to return to 0
+     Serial.println(encoder0Pos);
     }
-    else{
-      myservo.write(0);                
+  myservo.write(servoPoz); 
+  n = digitalRead(encoder0PinA);
+  if ((encoder0PinALast == LOW) && (n == HIGH)) {
+    if (digitalRead(encoder0PinB) == LOW) {
+      encoder0Pos--;
+    } else {
+      encoder0Pos++;
     }
+  }
+  
+  
+  encoder0PinALast = n;
+
+
   }
   
