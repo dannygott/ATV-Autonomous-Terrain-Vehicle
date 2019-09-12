@@ -28,3 +28,4 @@ while 1 :
         # send the character to the device
         # (note that I happend a \r\n carriage return and line feed to the characters - this is requested by my device)
         ser.write(bytes(inputA + "!", 'utf-8'))
+        ser.readline();
