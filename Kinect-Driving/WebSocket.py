@@ -23,11 +23,21 @@ def new_msg(client, server, message):
     print(messageObj['throttle']*180)
    # print(bytes(str(int(float(message)*180)) + "\r\n", 'utf-8'))
     ser.write(bytes(str(int(messageObj['throttle']*180))+ ',', 'utf-8'))
-    ser.write(bytes(str(int(messageObj['shiftup']) )+ ',', 'utf-8'))
-    ser.write(bytes(str(int(messageObj['shiftdown']) )+ ',', 'utf-8'))
-    print(ser.readline())
+    ser.write(bytes(str(shiftDetermine(messageObj))+ ',', 'utf-8'))
+    print("ENCODER VAL : " + str(ser.readline()))
+    print("SHIFT VAL : " + str(ser.readline()))
     
-
+def shiftDetermine(message):
+    shiftup = int(message['shiftup'])
+    shiftdown = int(message['shiftdown'])
+    if shiftup + shiftdown < 2:
+        if shiftup > 0:
+            return 2
+        elif shiftdown > 0:
+            return 1
+        else:
+            return 0
+    return 0
 
 server = WebsocketServer(13254, host='127.0.0.1')
 server.set_fn_new_client(new_client)

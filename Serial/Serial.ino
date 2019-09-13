@@ -9,7 +9,9 @@ int n = LOW;
 int servoPoz = 0;
 int shiftupPin = 22;
 int shiftdownPin = 23;
-int shiftVal = 1;
+int shiftVal = 0;
+int prevShiftVal = 0;
+int shiftPoz = 1;
 //1 is neutral
 
 void setup() {
@@ -28,22 +30,54 @@ void loop() {
     if (Serial.available()){
      // If anything comes in Serial (USB),
      servoPoz = Serial.readStringUntil(',').toInt();
-     digitalWrite( shiftupPin,Serial.readStringUntil(',').toInt());
-     digitalWrite( shiftdownPin,Serial.readStringUntil(',').toInt());
+     shiftVal = Serial.readStringUntil(',').toInt();
+     
      Serial.println(encoder0Pos);
+     Serial.println(shiftPoz);
     }
-  myservo.write(servoPoz); 
-  n = digitalRead(encoder0PinA);
-  if ((encoder0PinALast == LOW) && (n == HIGH)) {
-    if (digitalRead(encoder0PinB) == LOW) {
-      encoder0Pos--;
-    } else {
-      encoder0Pos++;
+
+    switch (shiftVal) {
+      case 0:
+        if(prevShiftVal == 1){
+          shiftPoz--;
+          prevShiftVal = 0;
+        }else if(prevShiftVal == 2){
+          shiftPoz++;
+          prevShiftVal = 0;
+        }
+        digitalWrite(shiftupPin, LOW);
+        digitalWrite(shiftdownPin, LOW);
+        break;
+      case 1:
+        if(shiftPoz > 0){
+          digitalWrite(shiftdownPin, HIGH);
+          prevShiftVal = shiftVal;
+        }
+        break;
+      
+      case 2:
+        if(shiftPoz < 3){
+          digitalWrite(shiftupPin, HIGH);
+          prevShiftVal = shiftVal;
+        }
+        break;
+      default:
+        break;
+} 
+
+    
+    myservo.write(servoPoz); 
+    n = digitalRead(encoder0PinA);
+    if ((encoder0PinALast == LOW) && (n == HIGH)) {
+      if (digitalRead(encoder0PinB) == LOW) {
+        encoder0Pos--;
+      } else {
+        encoder0Pos++;
+      }
     }
-  }
   
   
-  encoder0PinALast = n;
+   encoder0PinALast = n;
 
 
   }
