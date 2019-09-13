@@ -22,7 +22,9 @@ def new_msg(client, server, message):
    
     print(messageObj['throttle']*180)
    # print(bytes(str(int(float(message)*180)) + "\r\n", 'utf-8'))
-    ser.write(bytes(str(int(messageObj['throttle']*180)), 'utf-8'))
+    ser.write(bytes(str(int(messageObj['throttle']*180))+ ',', 'utf-8'))
+    ser.write(bytes(str(int(messageObj['shiftup']) )+ ',', 'utf-8'))
+    ser.write(bytes(str(int(messageObj['shiftdown']) )+ ',', 'utf-8'))
     print(ser.readline())
     
 

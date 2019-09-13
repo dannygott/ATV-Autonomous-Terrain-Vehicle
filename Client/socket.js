@@ -13,7 +13,10 @@ var notClosed = true;
         if (ws) {
           gamepad = navigator.getGamepads();
           gameValues = {
-            'throttle': gamepad[0].buttons[7].value
+            'throttle': gamepad[0].buttons[7].value,
+            'shiftup': gamepad[0].buttons[4].value,
+            'shiftdown': gamepad[0].buttons[5].value,
+
           }
           console.log(gameValues);
           ws.send(JSON.stringify(gameValues));
