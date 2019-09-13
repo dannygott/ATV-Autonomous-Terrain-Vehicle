@@ -3,6 +3,7 @@ import json
 import time
 import serial
 from websocket_server import WebsocketServer
+shiftVal = ""
 
 ser = serial.Serial(
     port='/dev/ttyACM0',
@@ -25,7 +26,9 @@ def new_msg(client, server, message):
     ser.write(bytes(str(int(messageObj['throttle']*180))+ ',', 'utf-8'))
     ser.write(bytes(str(shiftDetermine(messageObj))+ ',', 'utf-8'))
     print("ENCODER VAL : " + str(ser.readline()))
-    print("SHIFT VAL : " + str(ser.readline()))
+    shiftVal = str(ser.readline())
+    print("SHIFT VAL : " + shiftVal)
+    server.send_message_to_all(shiftVal)
     
 def shiftDetermine(message):
     shiftup = int(message['shiftup'])

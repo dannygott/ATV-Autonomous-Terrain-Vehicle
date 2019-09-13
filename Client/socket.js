@@ -1,4 +1,5 @@
 var notClosed = true;
+var gauge;
     window.addEventListener("gamepadconnected", function(e) {
       console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
         e.gamepad.index, e.gamepad.id,
@@ -34,24 +35,28 @@ var notClosed = true;
 
       // Set event handlers.
       ws.onopen = function() {
-        output("onopen");
+        output(1);
+        gauge = initGauge();
+        gauge.set(0);
+        
 
       };
       
       ws.onmessage = function(e) {
         // e.data contains received string.
-        output("onmessage: " + e.data);
+        //output("onmessage: " + e.data);
+        gauge.set(parseInt(e.data.charAt(2)))
       };
       
       ws.onclose = function() {
         setTimeout(init() , 1000);
-        output("onclose");
+        output(2);
         notClosed = false;
       };
 
       ws.onerror = function(e) {
         
-        output("onerror");
+        output(3);
         console.log(e)
       };
 
@@ -61,7 +66,7 @@ var notClosed = true;
       var input = document.getElementById("input");
       // You can send message to the Web Socket using ws.send.
       ws.send(input.value);
-      output("send: " + input.value);
+      //output("send: " + input.value);
       input.value = "";
       input.focus();
     }
@@ -71,8 +76,15 @@ var notClosed = true;
     }
     
     function output(str) {
-      var log = document.getElementById("log");
-      var escaped = str.replace(/&/, "&amp;").replace(/</, "&lt;").
-        replace(/>/, "&gt;").replace(/"/, "&quot;"); // "
-      log.innerHTML = escaped + "<br>" + log.innerHTML;
+      var log = document.getElementById("status");
+      if (str == 1) {
+        log.style.backgroundColor = "green";
+        
+      }else if (str == 2) {
+        log.style.backgroundColor = "orange";
+        
+      }else if (str == 3) {
+        log.style.backgroundColor = "red";
+        
+      }
     }

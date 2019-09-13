@@ -4,20 +4,24 @@
   <script type="text/javascript" src="gauge.min.js"></script>
   <script type="text/javascript" src="pageInfo.js"></script>
   <script type="text/javascript" src = "socket.js"></script>
+  <link rel = "stylesheet"
+  type = "text/css"
+  href = "main.css" />
   
     
 
   </script>
   
 </head>
-<body onload="init();">
+<body onload="init(); ">
   <form onsubmit="onSubmit(); return false;">
     <input type="text" id="input">
     <input type="submit" value="Send">
     <button onclick="onCloseClick(); return false;">close</button>
   </form>
-  <div id="log"></div>
-  <canvas id ="foo"></canvas>
+  <div id="status" class="status"></div>
+
+  <canvas id ="foo" ></canvas>
   
   
 </body>
