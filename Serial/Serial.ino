@@ -3,16 +3,19 @@ Servo myservo;  // create servo object to control a servo
 int val;
 int encoder0PinA = 32;
 int encoder0PinB = 33; 
-int encoder0Pos = 1;
+int encoder0Pos = 0;
 int encoder0PinALast = LOW;
 int n = LOW;
 int servoPoz = 0;
-int shiftupPin = 22;
-int shiftdownPin = 23;
+int shiftupPin = 24;
+int shiftdownPin = 25;
 int shiftVal = 0;
 int prevShiftVal = 0;
 int shiftPoz = 1;
 //1 is neutral
+int previousMillis = -1;
+int tBetweenPulse = 0;
+int previousEncoder0Pos = 0;
 
 void setup() {
   pinMode (encoder0PinA, INPUT);
@@ -31,9 +34,9 @@ void loop() {
      // If anything comes in Serial (USB),
      servoPoz = Serial.readStringUntil(',').toInt();
      shiftVal = Serial.readStringUntil(',').toInt();
-     
      Serial.println(encoder0Pos);
      Serial.println(shiftPoz);
+     Serial.println(encoderStopHandler(encoder0Pos));
     }
 
     switch (shiftVal) {
@@ -56,7 +59,7 @@ void loop() {
         break;
       
       case 2:
-        if(shiftPoz < 3){
+        if(shiftPoz < 4){
           digitalWrite(shiftupPin, HIGH);
           prevShiftVal = shiftVal;
         }
@@ -68,12 +71,31 @@ void loop() {
     
     myservo.write(servoPoz); 
     n = digitalRead(encoder0PinA);
+    
     if ((encoder0PinALast == LOW) && (n == HIGH)) {
+      
       if (digitalRead(encoder0PinB) == LOW) {
+        if (previousMillis == -1){
+          previousMillis = millis();
+        }
+        else{
+          tBetweenPulse = millis() - previousMillis;
+          previousMillis = millis();
+        }
+        
         encoder0Pos--;
       } else {
+         if (previousMillis == -1){
+          previousMillis = millis();
+        }
+        else{
+          tBetweenPulse = millis() - previousMillis;
+          previousMillis = millis();
+        }
         encoder0Pos++;
+        
       }
+     
     }
   
   
@@ -81,4 +103,12 @@ void loop() {
 
 
   }
+  int encoderStopHandler(int val){
+    
+    if (previousEncoder0Pos == val){
+      tBetweenPulse = 0;
+    }
+      previousEncoder0Pos = encoder0Pos;
+      return tBetweenPulse;
+    }
   

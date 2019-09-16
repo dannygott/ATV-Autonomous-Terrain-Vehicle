@@ -34,8 +34,11 @@ clearTimeout(retry)
     
     function init() {
       
-      gauge = initGauge();
-      gauge.set(0);
+      shiftGauge = initShiftGauge();
+      speedGauge = initSpeedGauge();
+
+      shiftGauge.set(0);
+      speedGauge.set(0);
       // Connect to Web Socket
       
       ws = new WebSocket("ws://localhost:13254/");
@@ -47,9 +50,12 @@ clearTimeout(retry)
       };
       
       ws.onmessage = function(e) {
+        console.log(e)
         // e.data contains received string.
         //output("onmessage: " + e.data);
-        gauge.set(parseInt(e.data.charAt(2)))
+        data = JSON.parse(e.data)
+        shiftGauge.set(data.shiftVal)
+        speedGauge.set(data.rpm)
         robotStatus(1);
       };
       

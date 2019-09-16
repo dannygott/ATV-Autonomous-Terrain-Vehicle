@@ -5,6 +5,7 @@ import serial
 from websocket_server import WebsocketServer
 shiftVal = ""
 
+
 ser = serial.Serial(
     port='/dev/ttyACM0',
     baudrate=2000000,
@@ -25,10 +26,30 @@ def new_msg(client, server, message):
    # print(bytes(str(int(float(message)*180)) + "\r\n", 'utf-8'))
     ser.write(bytes(str(int(messageObj['throttle']*180))+ ',', 'utf-8'))
     ser.write(bytes(str(shiftDetermine(messageObj))+ ',', 'utf-8'))
-    print("ENCODER VAL : " + str(ser.readline()))
+    encoderPoz = str(ser.readline())
+    encoderPoz = encoderPoz.strip("b'")
+    encoderPoz = encoderPoz.strip("\\r\\n'")
+    print("ENCODER POZ : " + encoderPoz)
     shiftVal = str(ser.readline())
-    print("SHIFT VAL : " + shiftVal)
-    server.send_message_to_all(shiftVal)
+    shiftVal = shiftVal.strip("b'")
+    shiftVal = shiftVal.strip("\\r\\n'")
+    print("SHIFT VAL : " + shiftVal) 
+    timeBetweenPulse = str(ser.readline())
+    print("Time between pulse: " + timeBetweenPulse)
+    timeBetweenPulse = timeBetweenPulse.strip("b'")
+    timeBetweenPulse = int(timeBetweenPulse.strip("\\r\\n'"))
+    
+    if timeBetweenPulse == 0:
+        rpm = 0
+    else:
+        frequency = 1000 / timeBetweenPulse
+        rpm = frequency * 60 / 360
+    print("RPM: " + str(rpm))
+    values = {"shiftVal": shiftVal, "rpm": rpm}
+    values_json = json.dumps(values)
+    server.send_message_to_all(values_json)
+    
+     
     
 def shiftDetermine(message):
     shiftup = int(message['shiftup'])
