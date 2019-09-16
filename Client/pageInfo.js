@@ -28,7 +28,7 @@ function initGauge(){
         }
         
     }
-    var target = document.getElementById('foo'); // your canvas element
+    var target = document.getElementById('shiftGauge'); // your canvas element
     var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
     gauge.maxValue = 3; // set max gauge value
     gauge.setMinValue(0);  // Prefer setter over gauge.minValue = 0
@@ -36,3 +36,61 @@ function initGauge(){
     gauge.set(0); // set actual value
     return gauge;
 }
+
+var ctx = document.getElementById('throttleGraph').getContext('2d');
+var throttleChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Throttle',
+            data: [0],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+var i = 0
+/*
+
+Used to test the chart refresh speed
+
+window.setInterval(() => {
+    myChart.data.labels.push(i.toString());
+    myChart.data.datasets[0].data.push(Math.ceil(Math.random() * 10));
+    myChart.update();
+    if (i>20) {
+        myChart.data.datasets[0].data.shift()
+        myChart.data.labels.shift();
+    }
+    i++
+}, 50);
+*/
+
+function pushThrottleData(chart,data) {
+    chart.data.labels.push(i.toString());
+    chart.data.datasets[0].data.push(data);
+    chart.update();
+    if (i>20) {
+        chart.data.datasets[0].data.shift()
+        chart.data.labels.shift();
+    }
+    i++
+}
+

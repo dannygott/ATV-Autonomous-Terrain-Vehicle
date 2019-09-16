@@ -1,5 +1,9 @@
 var notClosed = true;
 var gauge;
+var retry;
+
+clearTimeout(retry)
+
     window.addEventListener("gamepadconnected", function(e) {
       console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
         e.gamepad.index, e.gamepad.id,
@@ -20,6 +24,7 @@ var gauge;
 
           }
           console.log(gameValues);
+          pushThrottleData(throttleChart, gamepad[0].buttons[7].value);
           ws.send(JSON.stringify(gameValues));
         
         
@@ -28,35 +33,35 @@ var gauge;
     var ws;
     
     function init() {
-
+      
+      gauge = initGauge();
+      gauge.set(0);
       // Connect to Web Socket
       
       ws = new WebSocket("ws://localhost:13254/");
 
       // Set event handlers.
       ws.onopen = function() {
-        output(1);
-        gauge = initGauge();
-        gauge.set(0);
-        
-
+        webStatus(1);
+        robotStatus(2);
       };
       
       ws.onmessage = function(e) {
         // e.data contains received string.
         //output("onmessage: " + e.data);
         gauge.set(parseInt(e.data.charAt(2)))
+        robotStatus(1);
       };
       
       ws.onclose = function() {
-        setTimeout(init() , 1000);
-        output(2);
-        notClosed = false;
+          retry = setTimeout(function(){init()} , 3000);
+          webStatus(2);
+          notClosed = false;
       };
 
       ws.onerror = function(e) {
-        
-        output(3);
+        robotStatus(3);
+        webStatus(3);
         console.log(e)
       };
 
@@ -75,16 +80,30 @@ var gauge;
       ws.close();
     }
     
-    function output(str) {
-      var log = document.getElementById("status");
-      if (str == 1) {
-        log.style.backgroundColor = "green";
+    function webStatus(status) {
+      var display = document.getElementById("wsstatus");
+      if (status == 1) {
+        display.style.backgroundColor = "green";
         
-      }else if (str == 2) {
-        log.style.backgroundColor = "orange";
+      }else if (status == 2) {
+        display.style.backgroundColor = "orange";
         
-      }else if (str == 3) {
-        log.style.backgroundColor = "red";
+      }else if (status == 3) {
+        display.style.backgroundColor = "red";
+        
+      }
+    }
+
+    function robotStatus(status) {
+      var display = document.getElementById("rostatus");
+      if (status == 1) {
+        display.style.backgroundColor = "green";
+        
+      }else if (status == 2) {
+        display.style.backgroundColor = "orange";
+        
+      }else if (status == 3) {
+        display.style.backgroundColor = "red";
         
       }
     }

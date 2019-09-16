@@ -1,9 +1,10 @@
 <html>
 <head>
   <title>Simple client</title>
-  <script type="text/javascript" src="gauge.min.js"></script>
-  <script type="text/javascript" src="pageInfo.js"></script>
-  <script type="text/javascript" src = "socket.js"></script>
+  <script type="text/javascript" src="External-Files/gauge.min.js"></script>
+  <script type="text/javascript" src="External-Files/Chart.bundle.js"></script>
+  
+  
   <link rel = "stylesheet"
   type = "text/css"
   href = "main.css" />
@@ -14,15 +15,35 @@
   
 </head>
 <body onload="init(); ">
-  <form onsubmit="onSubmit(); return false;">
-    <input type="text" id="input">
-    <input type="submit" value="Send">
-    <button onclick="onCloseClick(); return false;">close</button>
-  </form>
-  <div id="status" class="status"></div>
+  <div class="header">
+  </div>
+  <div class = "status-container">
+      <div class="vert-container">
+          <h3 class="status-title">Web Socket Status</h1>
+          <div id="wsstatus" class="status"></div>
+      </div>
+      <div class="vert-container">
+          <h3 class="status-title">Robot Status</h1>
+          <div id="rostatus" class="status"></div>
+      </div>
 
-  <canvas id ="foo" ></canvas>
+  </div>
+  <div class="graphs">
+      
+    <div class="throttleGraphContainer">
+      <canvas id="throttleGraph"></canvas>
+    </div>
+    <div class="shiftGaugeContainer">
+      <canvas id="shiftGauge"></canvas>
+    </div>
+      
+  </div>
+  
+
+  
   
   
 </body>
+  <script type="text/javascript" src="pageInfo.js"></script>
+  <script type="text/javascript" src = "socket.js"></script>
 </html>
