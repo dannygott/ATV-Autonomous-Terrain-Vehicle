@@ -30,11 +30,12 @@ def new_msg(client, server, message):
     timeBetweenPulse = stripArduinoMessage(ser.readline())
     rpm = rpmCalc(timeBetweenPulse)
 
-    print(messageObj['throttle']*180)
+    print("THROTTLE VAL : " + str(messageObj['throttle']*180))
     print("SHIFT VAL : " + shiftVal) 
-    print("Time between pulse: " + timeBetweenPulse)
+    print("PULSE TIME : " + timeBetweenPulse)
     print("ENCODER POZ : " + encoderPoz)
     print("RPM: " + str(rpm))
+    print()
 
     values["shiftVal"] = shiftVal
     values["rpm"] = rpm
