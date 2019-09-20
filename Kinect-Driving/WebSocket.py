@@ -7,7 +7,7 @@ shiftVal = ""
 
 
 ser = serial.Serial(
-    port='/dev/ttyACM0',
+    port='/dev/ttyACM1',
     baudrate=2000000,
     parity=serial.PARITY_NONE,
     stopbits=serial.STOPBITS_ONE,

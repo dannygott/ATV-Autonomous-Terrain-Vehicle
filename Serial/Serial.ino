@@ -8,7 +8,9 @@ int encoder0PinALast = LOW;
 int n = LOW;
 int servoPoz = 0;
 int shiftupPin = 24;
-int shiftdownPin = 25;
+int shiftupStop = 25;
+int shiftdownPin = 23;
+int shiftdownStop = 22;
 int shiftVal = 0;
 int prevShiftVal = 0;
 int shiftPoz = 1;
@@ -50,16 +52,20 @@ void loop() {
         }
         digitalWrite(shiftupPin, LOW);
         digitalWrite(shiftdownPin, LOW);
+        digitalWrite(shiftdownStop, HIGH);
+        digitalWrite(shiftupStop, HIGH);
         break;
       case 1:
         if(shiftPoz > 0){
+          digitalWrite(shiftupStop, LOW);
           digitalWrite(shiftdownPin, HIGH);
           prevShiftVal = shiftVal;
         }
         break;
       
       case 2:
-        if(shiftPoz < 4){
+        if(shiftPoz < 3){
+          digitalWrite(shiftupStop, LOW);
           digitalWrite(shiftupPin, HIGH);
           prevShiftVal = shiftVal;
         }
