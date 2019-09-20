@@ -24,7 +24,7 @@ clearTimeout(retry)
 
           }
           console.log(gameValues);
-          pushThrottleData(throttleChart, gamepad[0].buttons[7].value);
+          pushThrottleData(throttleChart, gameValues.throttle);
           ws.send(JSON.stringify(gameValues));
         
         

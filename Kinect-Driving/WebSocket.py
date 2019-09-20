@@ -3,11 +3,12 @@ import json
 import time
 import serial
 from websocket_server import WebsocketServer
-shiftVal = ""
 
+values = {"shiftVal": 0, "rpm": 0}
 
 ser = serial.Serial(
-    port='/dev/ttyACM1',
+    #Create serial object to communicate with arduino
+    port='/dev/ttyACM0',
     baudrate=2000000,
     parity=serial.PARITY_NONE,
     stopbits=serial.STOPBITS_ONE,
@@ -16,36 +17,27 @@ ser = serial.Serial(
 )
 ser.isOpen()
 
-time.sleep(2)
+time.sleep(2) # wait for arduino to boot
+
 def new_client(client, server):
-	server.send_message_to_all("Hey all, a new client has joined us")
+	server.send_message_to_all("Controller connected")
 def new_msg(client, server, message):
     messageObj = json.loads(message)
-   
+    writeToArduino(messageObj)
+
+    encoderPoz = stripArduinoMessage(ser.readline())
+    shiftVal = stripArduinoMessage(ser.readline())
+    timeBetweenPulse = stripArduinoMessage(ser.readline())
+    rpm = rpmCalc(timeBetweenPulse)
+
     print(messageObj['throttle']*180)
-   # print(bytes(str(int(float(message)*180)) + "\r\n", 'utf-8'))
-    ser.write(bytes(str(int(messageObj['throttle']*180))+ ',', 'utf-8'))
-    ser.write(bytes(str(shiftDetermine(messageObj))+ ',', 'utf-8'))
-    encoderPoz = str(ser.readline())
-    encoderPoz = encoderPoz.strip("b'")
-    encoderPoz = encoderPoz.strip("\\r\\n'")
-    print("ENCODER POZ : " + encoderPoz)
-    shiftVal = str(ser.readline())
-    shiftVal = shiftVal.strip("b'")
-    shiftVal = shiftVal.strip("\\r\\n'")
     print("SHIFT VAL : " + shiftVal) 
-    timeBetweenPulse = str(ser.readline())
     print("Time between pulse: " + timeBetweenPulse)
-    timeBetweenPulse = timeBetweenPulse.strip("b'")
-    timeBetweenPulse = int(timeBetweenPulse.strip("\\r\\n'"))
-    
-    if timeBetweenPulse == 0:
-        rpm = 0
-    else:
-        frequency = 1000 / timeBetweenPulse
-        rpm = frequency * 60 / 360
+    print("ENCODER POZ : " + encoderPoz)
     print("RPM: " + str(rpm))
-    values = {"shiftVal": shiftVal, "rpm": rpm}
+
+    values["shiftVal"] = shiftVal
+    values["rpm"] = rpm
     values_json = json.dumps(values)
     server.send_message_to_all(values_json)
     
@@ -62,6 +54,23 @@ def shiftDetermine(message):
         else:
             return 0
     return 0
+
+def stripArduinoMessage(message):
+    return str(message).strip("b'").strip("\\r\\n'")
+
+def writeToArduino(messageVals):
+    ser.write(bytes(str(int(messageVals['throttle']*180))+ ',', 'utf-8'))
+    ser.write(bytes(str(shiftDetermine(messageVals))+ ',', 'utf-8'))
+
+def rpmCalc(pulseTime):
+    pulseTime = int(pulseTime)
+    if pulseTime == 0:
+        rpm = 0
+    else:
+        frequency = 1000 / pulseTime
+        rpm = frequency * 60 / 600
+    return rpm
+
 
 server = WebsocketServer(13254, host='127.0.0.1')
 server.set_fn_new_client(new_client)

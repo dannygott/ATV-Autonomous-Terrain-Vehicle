@@ -20,8 +20,8 @@ int tBetweenPulse = 0;
 int previousEncoder0Pos = 0;
 
 void setup() {
-  pinMode (encoder0PinA, INPUT);
-  pinMode (encoder0PinB, INPUT);
+  pinMode (encoder0PinA, INPUT_PULLUP);
+  pinMode (encoder0PinB, INPUT_PULLUP);
   pinMode (shiftupPin, OUTPUT);
   pinMode (shiftdownPin, OUTPUT);
   Serial.begin(2000000);
