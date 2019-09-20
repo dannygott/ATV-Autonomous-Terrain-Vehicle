@@ -3,6 +3,7 @@ import json
 import time
 import serial
 from websocket_server import WebsocketServer
+import subprocess as sp
 
 values = {"shiftVal": 0, "rpm": 0}
 
@@ -29,14 +30,16 @@ def new_msg(client, server, message):
     shiftVal = stripArduinoMessage(ser.readline())
     timeBetweenPulse = stripArduinoMessage(ser.readline())
     rpm = rpmCalc(timeBetweenPulse)
-
+    tmp = sp.call('clear',shell=True)
     print("THROTTLE VAL : " + str(messageObj['throttle']*180))
     print("SHIFT VAL : " + shiftVal) 
     print("PULSE TIME : " + timeBetweenPulse)
     print("ENCODER POZ : " + encoderPoz)
     print("RPM: " + str(rpm))
     print()
+   
 
+    
     values["shiftVal"] = shiftVal
     values["rpm"] = rpm
     values_json = json.dumps(values)
