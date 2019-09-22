@@ -5,9 +5,11 @@ Servo throttleServo;
 Servo turnSpeedController;
 // Engine Control Values
 // TODO Change engine control pins to actual pins on the board
-int engineStatorPin = 0;
+bool engineStatorPin = 0;
 int engineKillPin = 0;
 bool engineRunning = false;
+int engineTime = 0;
+int engineRPM = 0;
 // Indicator Values
 // TODO Change indicator pins to actual pins on the board
 int lightSolidPin = 0;
@@ -23,7 +25,7 @@ int tBetweenPulse = 0;
 int previousEncoder0Pos = 0;
 // Brake Values
 int brakePin = 0; // TODO Change brake value to actual pin on board
-bool breakStatus = 0;
+bool brakeStatus = 0;
 // Shifting Values
 int shiftupPin = 24;
 int shiftupStop = 25;
@@ -38,11 +40,12 @@ int turnPotPin = 0;
 int turnValue = 180;
 // Throttle Value
 int throttlePoz = 0;
-// Indicates status of entire system. 0 = Stopped, 1 = Running, 2 = Error
+// Indicates status of entire system. 0 = SYSTEMSTOP, 1 = RUNNING, 2 = EMERGENCY
 int systemStatus = 0;
 
 void setup() {
-  pinMode(encoder0PinA, INPUT_PULLUP); // Dont forget to change
+  // TODO Change back to old encoder (getrid of INPUT_PULLUP)
+  pinMode(encoder0PinA, INPUT_PULLUP);
   pinMode(encoder0PinB, INPUT_PULLUP);
   pinMode(shiftupPin, OUTPUT);
   pinMode(shiftdownPin, OUTPUT);
@@ -51,24 +54,30 @@ void setup() {
   throttleServo.attach(40);
   turnSpeedController.attach(41);
   Serial.setTimeout(10);
+  init(); // Run all tasks associated with starting the robot
 }
 
 void loop() {
+
   // If anything comes in Serial (USB)
   if (Serial.available()) {
 
     throttlePoz = Serial.readStringUntil(',').toInt();
     shiftVal = Serial.readStringUntil(',').toInt();
     turnValue = Serial.readStringUntil(',').toInt();
+    // systemStatus = Serial.readStringUntil(',').toInt(); TODO Implement Later
 
     Serial.println(encoder0Pos);
     Serial.println(shiftPoz);
     Serial.println(handleEncoderStop(encoder0Pos));
+    // Serial.println(brakeStatus); TODO Implement Later
     // Serial.println(systemStatus); TODO Implement Later
   }
+  checkState();
   handleTurn(turnValue);
   handleShift(shiftVal);
   handleEncoder(digitalRead(encoder0PinA));
+  digitalwrite(brakePin, brakeStatus);
   throttleServo.write(throttlePoz);
 }
 
@@ -157,7 +166,7 @@ void handleTurn(int poz) {
 // Handles changing the state between EMERGENCY STOP, SYSTEM STOP, and others
 void handleStateChange(int newState) {
   switch (newState) {
-  case 1:
+  case 2:
     // EMERGENCY STOP
     digitalWrite(engineKillPin, HIGH); // Set engine to kill
     handleTurn(360);                   // Set turning to max right
@@ -165,15 +174,18 @@ void handleStateChange(int newState) {
     digitalWrite(brakePin, HIGH);      // Turn brake on
 
     // Shift to neutral
-    // TODO Check if the engine is off then shift to 3
     shiftToPoint(0);
+    // Check if engine running, Shift to 3
     if (engineRunning == false) {
       shiftToPoint(5);
       handleHonk(1);
+    } else {
+      handleHonk(2);
     }
 
     break;
-  case 2:
+  case 0:
+    // TODO Create system stop state
     // SYSTEM STOP
     break;
   default:
@@ -199,6 +211,7 @@ void shiftToPoint(int val) {
   }
 }
 
+// Takes int designating pattern. 1 = Honk 5 times, 2 = Honk on, 0 = Stop
 void handleHonk(int pattern) {
   if (pattern == 1) {
     for (int i = 0; i < 5; i++) {
@@ -213,3 +226,40 @@ void handleHonk(int pattern) {
     digitalWrite(honkPin, LOW);
   }
 }
+
+// Check if systems are running normally. If there is a problem, change the
+// state
+void checkState() {
+  if (systemStatus != 0) {
+    handleStateChange(systemStatus);
+  } else {
+    if (engineRunning == false && getRobotSpeed() > 0) {
+      // EMERGENCY STOP
+      systemStatus = 2;
+      handleStateChange(2);
+    } else if (engineRunning == false) {
+      // SYSTEM STOP
+      handleStateChange(0);
+    }
+  }
+}
+
+// TODO Implement getRobotSpeed so we have robot RPM Arduino side
+int getRobotSpeed(int pulseTime) {}
+
+int getEngineSpeed() {
+  int t = 0;
+  if (engineTime > 100000) {
+    return 0;
+  } else {
+    if (digitalread(engineStatorPin) == HIGH) {
+      engineTime = millis();
+    } else {
+      t = millis() - engineTime;
+      return t;
+    }
+  }
+}
+
+// TODO Create function that starts the motor, changes status light, honks horn
+void init() {}
