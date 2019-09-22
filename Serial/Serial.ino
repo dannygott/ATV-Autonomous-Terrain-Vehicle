@@ -3,6 +3,11 @@
 // Servo objects
 Servo throttleServo;
 Servo turnSpeedController;
+// Indicator Pins
+// TODO: Change values to actual pins on the board
+int lightSolidPin = 0;
+int lightBlinkPin = 0;
+int honkPin = 0;
 // Encoder Pins
 int encoder0PinA = 32;
 int encoder0PinB = 33;
@@ -127,6 +132,8 @@ void handleEncoder(int encoderPinVal) {
   encoder0PinALast = encoderPinVal;
 }
 
+// Takes an int between 0-180 that defines where to turn to (0 full left, 180
+// full right)
 void handleTurn(int poz) {
   // reads the value of the potentiometer (value between 0 and 1023)
   int val = analogRead(potpin);
@@ -134,6 +141,18 @@ void handleTurn(int poz) {
 
   // If the current pot position is not equal to the turn value, turn the motor
   if (poz != val) {
-    turnSpeedController.write(val);
+    turnSpeedController.write(poz);
+  }
+}
+
+// Handles changing the state between EMERGENCY STOP, SYSTEM STOP, and others
+void handleStateChange(int newState) {
+  switch (newState) {
+  case 1:
+    handleTurn(360);
+    break;
+
+  default:
+    break;
   }
 }
