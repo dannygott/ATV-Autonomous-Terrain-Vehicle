@@ -3,33 +3,41 @@
 // Servo objects
 Servo throttleServo;
 Servo turnSpeedController;
-// Indicator Pins
-//  TODO Change values to actual pins on the board
+// Engine Control Values
+// TODO Change engine control pins to actual pins on the board
+int engineStatorPin = 0;
+int engineKillPin = 0;
+bool engineRunning = false;
+// Indicator Values
+// TODO Change indicator pins to actual pins on the board
 int lightSolidPin = 0;
 int lightBlinkPin = 0;
 int honkPin = 0;
-// Encoder Pins
+// Encoder Values
 int encoder0PinA = 32;
 int encoder0PinB = 33;
 int encoder0Pos = 0;
-// Shifting Pins
+int encoder0PinALast = LOW;
+int previousMillis = -1;
+int tBetweenPulse = 0;
+int previousEncoder0Pos = 0;
+// Brake Values
+int brakePin = 0; // TODO Change brake value to actual pin on board
+bool breakStatus = 0;
+// Shifting Values
 int shiftupPin = 24;
 int shiftupStop = 25;
 int shiftdownPin = 23;
 int shiftdownStop = 22;
-// Potentiometer pin for Turning
-int turnPotPin = 0;
-// Various value storage
-int encoder0PinALast = LOW;
-int servoPoz = 0;
-int n = LOW;
 int shiftVal = 0;
 int prevShiftVal = 0;
 int shiftPoz = 1;
-int previousMillis = -1;
-int tBetweenPulse = 0;
-int previousEncoder0Pos = 0;
+// Turning Values
+// TODO Change turning potentiometer value to actual pin on board
+int turnPotPin = 0;
 int turnValue = 180;
+// Throttle Value
+int throttlePoz = 0;
 // Indicates status of entire system. 0 = Stopped, 1 = Running, 2 = Error
 int systemStatus = 0;
 
@@ -38,6 +46,7 @@ void setup() {
   pinMode(encoder0PinB, INPUT_PULLUP);
   pinMode(shiftupPin, OUTPUT);
   pinMode(shiftdownPin, OUTPUT);
+  pinMode(brakePin, OUTPUT);
   Serial.begin(2000000);
   throttleServo.attach(40);
   turnSpeedController.attach(41);
@@ -48,19 +57,19 @@ void loop() {
   // If anything comes in Serial (USB)
   if (Serial.available()) {
 
-    servoPoz = Serial.readStringUntil(',').toInt();
+    throttlePoz = Serial.readStringUntil(',').toInt();
     shiftVal = Serial.readStringUntil(',').toInt();
     turnValue = Serial.readStringUntil(',').toInt();
 
     Serial.println(encoder0Pos);
     Serial.println(shiftPoz);
     Serial.println(handleEncoderStop(encoder0Pos));
-    // Serial.println(systemStatus); //TODO: Implement Later
+    // Serial.println(systemStatus); TODO Implement Later
   }
   handleTurn(turnValue);
   handleShift(shiftVal);
   handleEncoder(digitalRead(encoder0PinA));
-  throttleServo.write(servoPoz);
+  throttleServo.write(throttlePoz);
 }
 
 int handleEncoderStop(int encoderVal) {
@@ -149,10 +158,42 @@ void handleTurn(int poz) {
 void handleStateChange(int newState) {
   switch (newState) {
   case 1:
-    handleTurn(360);
-    break;
+    // EMERGENCY STOP
+    handleTurn(360);              // Set turning to max right
+    throttleServo.write(0);       // Return throttle to 0
+    digitalWrite(brakePin, HIGH); // Turn brake on
 
-  default:
+    // Shift to neutral
+    // TODO Check if the engine is off then shift to 3
+    // shiftToPoint(0);
+    // if (engineRunning) {
+    //  digitalWrite(engineKillPin, HIGH);
+    //} else {
+    //  /* code */
+    //}
     break;
+  case 2:
+    // SYSTEM STOP
+    break;
+  default:
+    // TODO Create a default condition
+    break;
+  }
+}
+
+// Shift to specified gear
+void shiftToPoint(int val) {
+  while (shiftPoz != val) {
+    if (shiftPoz > val) {
+      handleShift(1);
+      delay(500); // Delay to allow for return of piston TODO Test this value
+      handleShift(0);
+      delay(500);
+    } else if (shiftPoz < val) {
+      handleShift(2);
+      delay(500);
+      handleShift(0);
+      delay(500);
+    }
   }
 }
