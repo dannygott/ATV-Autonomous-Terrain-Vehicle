@@ -4,7 +4,7 @@
 Servo throttleServo;
 Servo turnSpeedController;
 // Indicator Pins
-// TODO: Change values to actual pins on the board
+// TODO Change values to actual pins on the board
 int lightSolidPin = 0;
 int lightBlinkPin = 0;
 int honkPin = 0;
