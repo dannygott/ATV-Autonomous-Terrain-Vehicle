@@ -159,18 +159,19 @@ void handleStateChange(int newState) {
   switch (newState) {
   case 1:
     // EMERGENCY STOP
-    handleTurn(360);              // Set turning to max right
-    throttleServo.write(0);       // Return throttle to 0
-    digitalWrite(brakePin, HIGH); // Turn brake on
+    digitalWrite(engineKillPin, HIGH); // Set engine to kill
+    handleTurn(360);                   // Set turning to max right
+    throttleServo.write(0);            // Return throttle to 0
+    digitalWrite(brakePin, HIGH);      // Turn brake on
 
     // Shift to neutral
     // TODO Check if the engine is off then shift to 3
-    // shiftToPoint(0);
-    // if (engineRunning) {
-    //  digitalWrite(engineKillPin, HIGH);
-    //} else {
-    //  /* code */
-    //}
+    shiftToPoint(0);
+    if (engineRunning == false) {
+      shiftToPoint(5);
+      handleHonk(1);
+    }
+
     break;
   case 2:
     // SYSTEM STOP
@@ -195,5 +196,20 @@ void shiftToPoint(int val) {
       handleShift(0);
       delay(500);
     }
+  }
+}
+
+void handleHonk(int pattern) {
+  if (pattern == 1) {
+    for (int i = 0; i < 5; i++) {
+      digitalWrite(honkPin, HIGH);
+      delay(500);
+      digitalWrite(honkPin, LOW);
+      delay(500);
+    }
+  } else if (pattern == 2) {
+    digitalWrite(honkPin, HIGH);
+  } else {
+    digitalWrite(honkPin, LOW);
   }
 }
