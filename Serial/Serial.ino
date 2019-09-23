@@ -5,7 +5,8 @@ Servo throttleServo;
 Servo turnSpeedController;
 // Engine Control Values
 // TODO Change engine control pins to actual pins on the board
-bool engineStatorPin = 0;
+int engineStatorPin = 0;
+int engineStartPin = 0;
 int engineKillPin = 0;
 bool engineRunning = false;
 int engineTime = 0;
@@ -168,6 +169,7 @@ void handleStateChange(int newState) {
   switch (newState) {
   case 2:
     // EMERGENCY STOP
+    digitalWrite(lightBlinkPin, HIGH);
     digitalWrite(engineKillPin, HIGH); // Set engine to kill
     handleTurn(360);                   // Set turning to max right
     throttleServo.write(0);            // Return throttle to 0
@@ -177,7 +179,7 @@ void handleStateChange(int newState) {
     shiftToPoint(0);
     // Check if engine running, Shift to 3
     if (engineRunning == false) {
-      shiftToPoint(5);
+      shiftToPoint(3);
       handleHonk(1);
     } else {
       handleHonk(2);
@@ -230,7 +232,7 @@ void handleHonk(int pattern) {
 // Check if systems are running normally. If there is a problem, change the
 // state
 void checkState() {
-  if (systemStatus != 0) {
+  if (systemStatus != 1) {
     handleStateChange(systemStatus);
   } else {
     if (engineRunning == false && getRobotSpeed() > 0) {
@@ -262,4 +264,19 @@ int getEngineSpeed() {
 }
 
 // TODO Create function that starts the motor, changes status light, honks horn
-void init() {}
+void init(int t int d) {
+  digitalWrite(lightBlinkPin, HIGH);
+  digitalWrite(engineStartPin, HIGH);
+  delay(t);
+  digitalWrite(engineStartPin, LOW);
+  delay(d);
+  if (engineRPM > 10) {
+    handleHonk(1);
+    delay(500);
+    handleHonk(0);
+    digitalWrite(lightBlinkPin, LOW);
+    digitalWrite(lightSolidPin, HIGH);
+  } else {
+    handleStateChange(0);
+  }
+}
