@@ -232,6 +232,9 @@ void handleHonk(int pattern) {
 // Check if systems are running normally. If there is a problem, change the
 // state
 void checkState() {
+  if (engineRPM < 3) {
+    engineRunning = false
+  }
   if (systemStatus != 1) {
     handleStateChange(systemStatus);
   } else {
@@ -263,7 +266,6 @@ int getEngineSpeed() {
   }
 }
 
-// TODO Create function that starts the motor, changes status light, honks horn
 void init(int t int d) {
   digitalWrite(lightBlinkPin, HIGH);
   digitalWrite(engineStartPin, HIGH);
@@ -276,6 +278,7 @@ void init(int t int d) {
     handleHonk(0);
     digitalWrite(lightBlinkPin, LOW);
     digitalWrite(lightSolidPin, HIGH);
+    engineRunning = true;
   } else {
     handleStateChange(0);
   }
