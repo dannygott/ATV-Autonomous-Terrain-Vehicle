@@ -76,8 +76,18 @@ while True:
     # visualization backend.
     #im_with_keypoints = cv2.drawKeypoints(depth.asarray(), keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     #cv2.imshow("depthBlobs", im_with_keypoints / 4500.)
-    edges = cv2.Canny(color.asarray(np.uint8),50,300)
-    cv2.imshow("CUNT", edges / 4500.)
+
+    # Start on function that gets birds eye view
+    x = 0
+    y = 0
+    for item in depth.asarray():
+        x += 1
+        for D in item:
+            # TODO Plot points
+            y += 1
+
+    edges = cv2.Canny(color.asarray(np.uint8), 50, 300)
+    cv2.imshow("CANNY EDGES", edges / 4500.)
     cv2.imshow("depth", depth.asarray() / 4500.)
     cv2.imshow("color", cv2.resize(color.asarray(),
                                    (int(1920 / 3), int(1080 / 3))))
