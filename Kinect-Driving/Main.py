@@ -7,6 +7,7 @@ from pylibfreenect2 import FrameType, Registration, Frame
 from pylibfreenect2 import createConsoleLogger, setGlobalLogger
 from pylibfreenect2 import LoggerLevel
 # Start a blob detector
+x=0
 detector = cv2.SimpleBlobDetector()
 
 try:
@@ -59,6 +60,15 @@ bigdepth = Frame(1920, 1082, 4) if need_bigdepth else None
 color_depth_map = np.zeros((424, 512),  np.int32).ravel() \
     if need_color_depth_map else None
 detector = cv2.SimpleBlobDetector()
+
+def toBirdsEye(array):
+    newArray = np.zeros(shape = (424,512))
+    for i in range(array.shape[0]):
+        for j in range(array.shape[1]):
+            if(array[i,j] != 0):
+                newArray[int(array[i,j] // 13),j] = 2555
+            
+    return newArray
 while True:
     frames = listener.waitForNewFrame()
 
@@ -78,17 +88,17 @@ while True:
     #cv2.imshow("depthBlobs", im_with_keypoints / 4500.)
 
     # Start on function that gets birds eye view
-    x = 0
-    y = 0
-    for item in depth.asarray():
-        x += 1
-        for D in item:
-            # TODO Plot points
-            y += 1
+ 
+    if x==0:
+        print( "depth array y length: " + str(depth.asarray().size))
+        print("depth array x length: " + str(depth.asarray()[0].size))
+        print(toBirdsEye(depth.asarray()))
+        x=1
+    jaun = toBirdsEye(depth.asarray())
 
     edges = cv2.Canny(color.asarray(np.uint8), 50, 300)
     cv2.imshow("CANNY EDGES", edges / 4500.)
-    cv2.imshow("depth", depth.asarray() / 4500.)
+    cv2.imshow("depth", jaun / 4500.)
     cv2.imshow("color", cv2.resize(color.asarray(),
                                    (int(1920 / 3), int(1080 / 3))))
     cv2.imshow("registered", registered.asarray(np.uint8))

@@ -2,5 +2,6 @@
     "programmer": "AVR ISP",
     "board": "arduino:avr:mega",
     "configuration": "cpu=atmega2560",
-    "port": "COM3"
+    "port": "/dev/ttyACM0",
+    "sketch": "Serial/Serial.ino"
 }

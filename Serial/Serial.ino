@@ -55,7 +55,7 @@ void setup() {
   throttleServo.attach(40);
   turnSpeedController.attach(41);
   Serial.setTimeout(10);
-  init(); // Run all tasks associated with starting the robot
+  init(400,500); // Run all tasks associated with starting the robot
 }
 
 void loop() {
@@ -78,7 +78,7 @@ void loop() {
   handleTurn(turnValue);
   handleShift(shiftVal);
   handleEncoder(digitalRead(encoder0PinA));
-  digitalwrite(brakePin, brakeStatus);
+  digitalWrite(brakePin, brakeStatus);
   throttleServo.write(throttlePoz);
 }
 
@@ -155,7 +155,7 @@ void handleEncoder(int encoderPinVal) {
 // full right)
 void handleTurn(int poz) {
   // reads the value of the potentiometer (value between 0 and 1023)
-  int val = analogRead(potpin);
+  int val = analogRead(turnPotPin);
   val = map(val, 0, 1023, 0, 360); // Map pot values to make sense to servo
 
   // If the current pot position is not equal to the turn value, turn the motor
@@ -233,12 +233,12 @@ void handleHonk(int pattern) {
 // state
 void checkState() {
   if (engineRPM < 3) {
-    engineRunning = false
+    engineRunning = false;
   }
   if (systemStatus != 1) {
     handleStateChange(systemStatus);
   } else {
-    if (engineRunning == false && getRobotSpeed() > 0) {
+    if (engineRunning == false && getRobotSpeed(5) > 0) { //TODO replace 5 in getRobotSpeed with pulse var
       // EMERGENCY STOP
       systemStatus = 2;
       handleStateChange(2);
@@ -257,7 +257,7 @@ int getEngineSpeed() {
   if (engineTime > 100000) {
     return 0;
   } else {
-    if (digitalread(engineStatorPin) == HIGH) {
+    if (digitalRead(engineStatorPin) == HIGH) {
       engineTime = millis();
     } else {
       t = millis() - engineTime;
@@ -266,7 +266,7 @@ int getEngineSpeed() {
   }
 }
 
-void init(int t int d) {
+void init(int t ,int d) {
   digitalWrite(lightBlinkPin, HIGH);
   digitalWrite(engineStartPin, HIGH);
   delay(t);
