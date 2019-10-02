@@ -61,14 +61,28 @@ color_depth_map = np.zeros((424, 512),  np.int32).ravel() \
     if need_color_depth_map else None
 detector = cv2.SimpleBlobDetector()
 
-def toBirdsEye(array):
-    newArray = np.zeros(shape = (424,512))
-    for i in range(array.shape[0]):
-        for j in range(array.shape[1]):
-            if(array[i,j] != 0):
-                newArray[int(array[i,j] // 13),j] = 2555
+# def toBirdsEye(array):
+#     newArray = np.zeros(shape = (424,512))
+#     for i in range(array.shape[0]):
+#         for j in range(array.shape[1]):
+#             if(array[i,j] != 0):
+#                 newArray[int(array[i,j] // 13),j] = 2555
             
-    return newArray
+#     return newArray\
+
+def toBirdsEye(array):
+    fillArr = np.full((424),2555)
+    #newArr = np.empty(shape = (424,512))
+    newArr = np.array([])
+    for column in array.T:
+        column = np.interp(column, (0, 3000), (0, 423)).astype(int)
+        tempCol = np.zeros(shape = (424))
+        np.put(tempCol,column,fillArr)
+       
+       # np.concatenate((newArr, column.reshape(424,1)),axis=1)
+        newArr = np.concatenate((newArr, tempCol))
+    return newArr.reshape(512,424).T
+    
 while True:
     frames = listener.waitForNewFrame()
 
@@ -95,7 +109,7 @@ while True:
         print(toBirdsEye(depth.asarray()))
         x=1
     jaun = toBirdsEye(depth.asarray())
-
+  
     edges = cv2.Canny(color.asarray(np.uint8), 50, 300)
     cv2.imshow("CANNY EDGES", edges / 4500.)
     cv2.imshow("depth", jaun / 4500.)
