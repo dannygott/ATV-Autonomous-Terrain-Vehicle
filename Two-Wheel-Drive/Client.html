@@ -1,0 +1,57 @@
+<html>
+<head>
+  <title>Simple client</title>
+  <script type="text/javascript" src="External-Files/gauge.min.js"></script>
+  <script type="text/javascript" src="External-Files/Chart.bundle.js"></script>
+  
+  
+  <link rel = "stylesheet"
+  type = "text/css"
+  href = "main.css" />
+  
+    
+
+ 
+  
+</head>
+<body onload="init(); ">
+  <div class="header">
+  </div>
+  <div class = "status-container">
+      <div class="vert-container">
+          <h3 class="status-title">Web Socket Status</h1>
+          <div id="wsstatus" class="status"></div>
+      </div>
+      <div class="vert-container">
+          <h3 class="status-title">Robot Status</h1>
+          <div id="rostatus" class="status"></div>
+      </div>
+
+  </div>
+  <div class="graphs">
+      
+    <div class="throttleGraphContainer">
+      <canvas id="throttleGraph"></canvas>
+    </div>
+    <div class="shiftGaugeContainer">
+      <h3 class = "shiftGaugeTitle"> Shift Gauge</h3>
+
+      <canvas id="shiftGauge"></canvas>
+    </div>
+    
+    <div class="shiftGaugeContainer">
+      <h3 class = "shiftGaugeTitle"> Speed Gauge</h3>
+      
+      <canvas id="speedGauge"></canvas>
+    </div>
+      
+  </div>
+  
+
+  
+  
+  
+</body>
+  <script type="text/javascript" src="pageInfo.js"></script>
+  <script type="text/javascript" src = "socket.js"></script>
+</html>
