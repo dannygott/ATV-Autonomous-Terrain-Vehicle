@@ -8,7 +8,7 @@ clearTimeout(retry)
       console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
         e.gamepad.index, e.gamepad.id,
         e.gamepad.buttons.length, e.gamepad.axes.length);
-        console.log(e.gamepad.buttons)
+        console.log(e.gamepad.axes)
         window.setInterval(function(){
           sendGamePadState()
         }, 50);
@@ -17,14 +17,14 @@ clearTimeout(retry)
     function sendGamePadState() {
         if (ws) {
           gamepad = navigator.getGamepads();
-          var direction = gamepad[0].axes[2].value * 180 // A value between 180 and -180
-          var power = gamepad[0].axes[3].value * 180 // Ditto
-          var leftMotor = power - direction
-          var rightMotor = power + direction
+          var direction = Math.round(gamepad[0].axes[2] * 50) // A value between 180 and -180
+          var power = Math.round(gamepad[0].axes[3]* 50) // Ditto
+          var leftMotor = power + direction
+          var rightMotor = power - direction
 
           gameValues = {
-            'leftMotor': gamepad[0].buttons[7].value,
-            'rightMotor': gamepad[0].buttons[4].value,
+            'leftMotor': leftMotor,
+            'rightMotor': rightMotor,
             'mower': gamepad[0].buttons[5].value,
 
           }
@@ -58,10 +58,10 @@ clearTimeout(retry)
         console.log(e)
         // e.data contains received string.
         //output("onmessage: " + e.data);
-        data = JSON.parse(e.data)
-        shiftGauge.set(data.shiftVal)
-        speedGauge.set(data.rpm)
-        robotStatus(1);
+        //data = JSON.parse(e.data)
+        //shiftGauge.set(data.shiftVal)
+        //speedGauge.set(data.rpm)
+        //robotStatus(1);
       };
       
       ws.onclose = function() {

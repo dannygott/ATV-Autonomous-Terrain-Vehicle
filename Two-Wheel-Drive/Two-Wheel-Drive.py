@@ -5,7 +5,7 @@ import serial
 from websocket_server import WebsocketServer
 import subprocess as sp
 
-values = {"shiftVal": 0, "rpm": 0}
+values = {"leftMotor": 0, "rightMotor": 0}
 
 ser = serial.Serial(
     #Create serial object to communicate with arduino

@@ -1,0 +1,75 @@
+html{
+    font: 1em sans-serif;
+    height: 100%;
+    width: 100%;
+    padding: 0%;
+}
+body{
+    margin: 0%;
+}
+.status {
+    width: 6vh;
+    height: 6vh;
+    background-color: darkgray;
+    border-radius: 50%;
+    align-self: center;
+    margin: 0;
+}
+.header {
+    margin-bottom: 2%;
+    height: 5%;
+    text-align: center;
+    background: #0a5dbb;
+    color: white;
+    font-size: 30px;
+}
+.status-container{
+    display: flex;
+    background-color: rgb(228, 228, 228); 
+    flex-direction: row;
+    vertical-align: middle;
+    text-align: center;
+    line-height: 90px;
+    height: 12vh;
+    justify-content: space-evenly;
+    margin-bottom: 1%;
+
+}
+.vert-container{
+    margin-top: 1vh;
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+}
+.status-title{
+    line-height: 4%;
+}
+.graphs{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 20%;
+    width: 100%;
+
+}
+.shiftGaugeContainer{
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+.throttleGraphContainer{
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+#shiftGauge{
+    width: 100%;
+    height: 100%;
+}
+.shiftGaugeTitle{
+    text-align: center;
+}
+#speedGauge{
+    width: 100%;
+    height: 100%;
+}
+
+

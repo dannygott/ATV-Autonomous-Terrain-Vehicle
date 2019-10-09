@@ -71,7 +71,7 @@ detector = cv2.SimpleBlobDetector()
 #     return newArray\
 
 def toBirdsEye(array):
-    fillArr = np.full((424),2555)
+    fillArr = np.full((424),200)
     #newArr = np.empty(shape = (424,512))
     newArr = np.array([])
     for column in array.T:
@@ -82,7 +82,7 @@ def toBirdsEye(array):
        # np.concatenate((newArr, column.reshape(424,1)),axis=1)
         newArr = np.concatenate((newArr, tempCol))
     return newArr.reshape(512,424).T
-    
+
 while True:
     frames = listener.waitForNewFrame()
 
@@ -108,7 +108,12 @@ while True:
         print("depth array x length: " + str(depth.asarray()[0].size))
         print(toBirdsEye(depth.asarray()))
         x=1
+    
     jaun = toBirdsEye(depth.asarray())
+   
+    jaun2=  cv2.fastNlMeansDenoising(jaun,None,10,10,7,21)
+    
+
   
     edges = cv2.Canny(color.asarray(np.uint8), 50, 300)
     cv2.imshow("CANNY EDGES", edges / 4500.)
