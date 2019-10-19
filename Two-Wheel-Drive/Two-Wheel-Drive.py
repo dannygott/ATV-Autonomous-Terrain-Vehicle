@@ -48,7 +48,7 @@ def rpmCalc(pulseTime):
     return rpm
 
 
-server = WebsocketServer(13254, host='127.0.0.1')
+server = WebsocketServer(13254, host = "192.168.1.5")
 server.set_fn_new_client(new_client)
 server.set_fn_message_received(new_msg)
 server.run_forever()
